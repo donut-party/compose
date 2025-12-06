@@ -97,3 +97,9 @@
                      ^::dc/map-updates
                      {:a {:b {:c {}}}
                       :d {:e (dc/>into [4 5 6])}}))))
+
+(deftest compose-with-metadata-updaters-test
+  (is (= {:foo [4 5 6 1 2 3]}
+         (dc/compose {:foo [1 2 3]}
+                     ^::dc/map-updates
+                     {:foo ^::dc/>into [4 5 6]}))))
