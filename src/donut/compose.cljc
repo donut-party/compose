@@ -2,9 +2,7 @@
   (:require
    [clojure.core :as clj]
    [donut.compose.macros :refer [defupdater]])
-  (:refer-clojure
-   :exclude
-   [update merge into conj assoc map mapv or]))
+  (:refer-clojure :exclude [update merge into conj assoc map mapv or]))
 
 (declare
  update  merge  into  conj  assoc  map  mapv
