@@ -5,10 +5,19 @@
   (:refer-clojure :exclude [update merge into conj assoc map mapv or]))
 
 (declare
- update  merge  into  conj  assoc  map  mapv
- >update >merge >into >conj >assoc >map >mapv)
+ update >update
+ merge  >merge
+ into   >into
+ conj   >conj
+ assoc
+ map    >map
+ mapv   >mapv)
 
 (defn >f
+  "combinator that swaps first two args to a function.
+
+  the `>` is meant as a mnemonic for this arg swapping: `sort` sorts ascending
+  by default but you can reverse the order with `>`"
   [f]
   (fn arg-swapped
     ([a b] (f b a))
@@ -26,13 +35,27 @@
     {::update-f (>f f)
      ::args     args}))
 
+;;---
+;; updaters
+;;---
+
 (defupdater update clj/update)
 (defupdater merge clj/merge)
 (defupdater into clj/into)
 (defupdater conj clj/conj)
-(defupdater assoc clj/assoc)
 (defupdater map clj/map)
 (defupdater mapv clj/mapv)
+
+(def assoc (updater clj/assoc))
+
+(defn orf
+  "or as a function so that it can be treated as a value"
+  [& args]
+  (some identity args))
+
+(def or
+  "use this when you want to prefer the left side of a compose"
+  (updater orf))
 
 (def metadata-updaters
   {::merge  merge
@@ -42,18 +65,18 @@
    ::conj   conj
    ::>conj  >conj
    ::assoc  assoc
-   ::>assoc >assoc})
+   ::or     or})
 
 (def metadata-updaters-set (->> metadata-updaters keys set))
 
-(defn orf
-  "or as a function so that it can be treated as a value"
-  [& args]
-  (some identity args))
-
-(def or (updater orf))
+;;---
+;; composing
+;;---
 
 (defn map->updates
+  "helper that converts a map to the updates form needed to apply updates. lets
+  you write your updates in the shape of the base structure if you're into that
+  kind of thing."
   [m]
   (loop [updates         {}
          remaining-paths (clj/mapv vector (keys m))]
