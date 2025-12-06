@@ -123,7 +123,9 @@
           :>conj    [:x :y]
           :update-1 2
           :update-2 {:a 1, :b 2}
-          :or       :a}
+          :or       :a
+          :map      [2 3 4]
+          :mapv     [2 3 4]}
          (dc/compose {:into     [1 2 3]
                       :>into    [1 2 3]
                       :merge    {:a 1, :b 1}
@@ -132,7 +134,9 @@
                       :>conj    :y
                       :update-1 1
                       :update-2 {:a 1}
-                      :or       :a}
+                      :or       :a
+                      :map      [1 2 3]
+                      :mapv     [1 2 3]}
                      ^::dc/map-updates
                      {:into     (dc/into [4 5 6])
                       :>into    (dc/>into [4 5 6])
@@ -142,4 +146,6 @@
                       :>conj    (dc/>conj [:x])
                       :update-1 (dc/update inc)
                       :update-2 (dc/update merge {:b 2})
-                      :or       (dc/or :b)}))))
+                      :or       (dc/or :b)
+                      :map      (dc/>map inc)
+                      :mapv     (dc/>mapv inc)}))))
