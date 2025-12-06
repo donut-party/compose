@@ -37,7 +37,6 @@
 (def into   (updater clj/into))
 (def >into  (updater (>f clj/into)))
 (def conj   (updater clj/conj))
-(def >conj  (updater (>f clj/conj)))
 (def map    (updater (>f clj/map)))
 (def mapv   (updater (>f clj/mapv)))
 

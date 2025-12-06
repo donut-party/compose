@@ -120,7 +120,6 @@
           :merge    {:a 1, :b 2}
           :>merge   {:a 1, :b 1}
           :conj     [:x :y]
-          :>conj    [:x :y]
           :update-1 2
           :update-2 {:a 1, :b 2}
           :or       :a
@@ -131,7 +130,6 @@
                       :merge    {:a 1, :b 1}
                       :>merge   {:a 1, :b 1}
                       :conj     [:x]
-                      :>conj    :y
                       :update-1 1
                       :update-2 {:a 1}
                       :or       :a
@@ -143,7 +141,6 @@
                       :merge    (dc/merge {:b 2})
                       :>merge   (dc/>merge {:b 2})
                       :conj     (dc/conj :y)
-                      :>conj    (dc/>conj [:x])
                       :update-1 (dc/update inc)
                       :update-2 (dc/update merge {:b 2})
                       :or       (dc/or :b)
