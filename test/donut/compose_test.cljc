@@ -147,5 +147,5 @@
                       :update-1 (dc/update inc)
                       :update-2 (dc/update merge {:b 2})
                       :or       (dc/or :b)
-                      :map      (dc/>map inc)
-                      :mapv     (dc/>mapv inc)}))))
+                      :map      (dc/map inc)
+                      :mapv     (dc/mapv inc)}))))

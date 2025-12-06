@@ -1,16 +1,7 @@
 (ns donut.compose
   (:require
-   [clojure.core :as clj]
-   [donut.compose.macros :refer [defupdater]])
+   [clojure.core :as clj])
   (:refer-clojure :exclude [update merge into conj map mapv or]))
-
-(declare
- update
- merge  >merge
- into   >into
- conj   >conj
- map    >map
- mapv   >mapv)
 
 (defn >f
   "combinator that swaps first two args to a function.
@@ -28,21 +19,9 @@
     {::update-f f
      ::args     args}))
 
-(defn >updater
-  [f]
-  (fn [& args]
-    {::update-f (>f f)
-     ::args     args}))
-
 ;;---
 ;; updaters
 ;;---
-
-(defupdater merge clj/merge)
-(defupdater into clj/into)
-(defupdater conj clj/conj)
-(defupdater map clj/map)
-(defupdater mapv clj/mapv)
 
 (defn orf
   "or as a function so that it can be treated as a value"
@@ -52,6 +31,15 @@
 (def or
   "use this when you want to prefer the left side of a compose"
   (updater orf))
+
+(def merge  (updater clj/merge))
+(def >merge (updater (>f clj/merge)))
+(def into   (updater clj/into))
+(def >into  (updater (>f clj/into)))
+(def conj   (updater clj/conj))
+(def >conj  (updater (>f clj/conj)))
+(def map    (updater (>f clj/map)))
+(def mapv   (updater (>f clj/mapv)))
 
 (defn update
   [f & args]
