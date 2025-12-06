@@ -2,14 +2,13 @@
   (:require
    [clojure.core :as clj]
    [donut.compose.macros :refer [defupdater]])
-  (:refer-clojure :exclude [update merge into conj assoc map mapv or]))
+  (:refer-clojure :exclude [update merge into conj map mapv or]))
 
 (declare
- update >update
+ update
  merge  >merge
  into   >into
  conj   >conj
- assoc
  map    >map
  mapv   >mapv)
 
@@ -39,14 +38,11 @@
 ;; updaters
 ;;---
 
-(defupdater update clj/update)
 (defupdater merge clj/merge)
 (defupdater into clj/into)
 (defupdater conj clj/conj)
 (defupdater map clj/map)
 (defupdater mapv clj/mapv)
-
-(def assoc (updater clj/assoc))
 
 (defn orf
   "or as a function so that it can be treated as a value"
@@ -57,17 +53,9 @@
   "use this when you want to prefer the left side of a compose"
   (updater orf))
 
-(def metadata-updaters
-  {::merge  merge
-   ::>merge >merge
-   ::into   into
-   ::>into  >into
-   ::conj   conj
-   ::>conj  >conj
-   ::assoc  assoc
-   ::or     or})
-
-(def metadata-updaters-set (->> metadata-updaters keys set))
+(defn update
+  [f & args]
+  (apply (updater f) args))
 
 ;;---
 ;; composing
@@ -90,8 +78,7 @@
         (clj/or (not current-map?)
                 (and current-map?
                      (clj/or (empty? current-value)
-                             (::update-f current-value)
-                             (-> current-value meta keys metadata-updaters-set))))
+                             (::update-f current-value))))
         (recur (clj/assoc updates current-path current-value)
                new-remaining-paths)
 
@@ -101,21 +88,11 @@
                                    (keys current-value))
                          new-remaining-paths))))))
 
-(defn use-meta
-  [x]
-  (if-let [update-f (-> (select-keys metadata-updaters
-                                     (keys (meta x)))
-                        first
-                        second)]
-    (update-f x)
-    x))
-
 (defn apply-update
   [base path update-val]
-  (let [update-val (use-meta update-val)]
-    (if-let [update-function (::update-f update-val)]
-      (update-in base path (fn [x] (apply update-function x (::args update-val))))
-      (assoc-in base path update-val))))
+  (if-let [update-function (::update-f update-val)]
+    (update-in base path (fn [x] (apply update-function x (::args update-val))))
+    (assoc-in base path update-val)))
 
 (defn compose
   [base updates]

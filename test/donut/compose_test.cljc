@@ -3,11 +3,6 @@
             #?(:clj [clojure.test :refer [deftest is]]
                :cljs [cljs.test :refer [deftest is] :include-macros true])))
 
-;;---
-;; Testing using path syntax
-;;---
-
-
 (deftest compose-test
   (is (= {} (dc/compose {} {})))
 
@@ -119,16 +114,29 @@
                      {:a {:b {:c {}}}
                       :d {:e (dc/>into [4 5 6])}}))))
 
-;; you can use metadata to indicate use of some updaters
-(deftest compose-with-metadata-updaters-test
-  (is (= {:foo [4 5 6 1 2 3]}
-         (dc/compose {:into   [1 2 3]
-                      :>into  [1 2 3]
-                      :merge  {:a 1}
-                      :>merge {:a 1}
-                      :conj [:x]
-                      :>conj :x
-                      :assoc {:a 1}
-                      }
+(deftest updaters-test
+  (is (= {:into     [1 2 3 4 5 6]
+          :>into    [4 5 6 1 2 3]
+          :merge    {:a 1, :b 2}
+          :>merge   {:a 1, :b 1}
+          :conj     [:x :y]
+          :>conj    [:x :y]
+          :update-1 2
+          :update-2 {:a 1, :b 2}}
+         (dc/compose {:into     [1 2 3]
+                      :>into    [1 2 3]
+                      :merge    {:a 1, :b 1}
+                      :>merge   {:a 1, :b 1}
+                      :conj     [:x]
+                      :>conj    :y
+                      :update-1 1
+                      :update-2 {:a 1}}
                      ^::dc/map-updates
-                     {:foo ^::dc/>into [4 5 6]}))))
+                     {:into     (dc/into [4 5 6])
+                      :>into    (dc/>into [4 5 6])
+                      :merge    (dc/merge {:b 2})
+                      :>merge   (dc/>merge {:b 2})
+                      :conj     (dc/conj :y)
+                      :>conj    (dc/>conj [:x])
+                      :update-1 (dc/update inc)
+                      :update-2 (dc/update merge {:b 2})}))))
