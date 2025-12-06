@@ -42,80 +42,58 @@
          (dc/compose {:foo [1 2 3]}
                      {[:foo] (dc/>into [4 5 6])}))))
 
-(deftest map->composable-test
+(deftest map->updates-test
   (is (= {[:a] 1}
-         (dc/map->composition {:a 1})))
+         (dc/map->updates {:a 1})))
 
   (is (= {[:a :b :c] :d}
-         (dc/map->composition {:a {:b {:c :d}}})))
+         (dc/map->updates {:a {:b {:c :d}}})))
 
   (is (= {[:a :b :c] :d
           [:a :b :e] {}
           [:x]       []
           [:y]       {}}
-         (dc/map->composition {:a {:b {:c :d
-                                       :e {}}}
-                               :x []
-                               :y {}}))))
+         (dc/map->updates {:a {:b {:c :d
+                                   :e {}}}
+                           :x []
+                           :y {}}))))
 
-(deftest compose-with-map->composable-test
+(deftest compose-with-map->updates-test
   (is (= {:a {:b 1
               :c 2}}
          (dc/compose {:a {:b 1}}
-                     (dc/map->composition
+                     (dc/map->updates
                       {:a (dc/>merge {:b 4 :c 2})}))))
 
   (is (= {:foo [4 5 6 1 2 3]}
          (dc/compose {:foo [1 2 3]}
-                     (dc/map->composition
+                     (dc/map->updates
                       {:foo (dc/>into [4 5 6])}))))
 
   (is (= {:a {:b {:c {}}}
           :d {:e [4 5 6 1 2 3]}}
          (dc/compose {:a {:b {:c :going-awway}}
                       :d {:e [1 2 3]}}
-                     (dc/map->composition
+                     (dc/map->updates
                       {:a {:b {:c {}}}
                        :d {:e (dc/>into [4 5 6])}})))))
 
+(deftest compose-with-map-updates-metadata-test
+  (is (= {:a {:b 1
+              :c 2}}
+         (dc/compose {:a {:b 1}}
+                     ^::dc/map-updates
+                     {:a (dc/>merge {:b 4 :c 2})})))
 
-;; data-oriented program involves describing what's to be done as much as
-;; possible with data, deferring execution of that until later
-;;
-;; as a result, "composition" often happens through data composition, but doing
-;; that is always kind of tricky
-;;
-;; value prop of this library is to provide a clear and intuitive means of data composition:
-;; - "deep merge" - recursively merge arbitrarily nested data structures
-;; - flexbility around how you handle merging any particular node using update semantics
+  (is (= {:foo [4 5 6 1 2 3]}
+         (dc/compose {:foo [1 2 3]}
+                     ^::dc/map-updates
+                     {:foo (dc/>into [4 5 6])})))
 
-(dc/compose
- {:a {:b 1}}
- {[:a] (dc/merge {:c 2 :d 3})})
-;; =>
-{:a {:b 1
-     :c 2
-     :d 3}}
-
-;; use into to merge two values
-(dc/compose
- {:a {:b {:c :going-awway}}
-  :d {:e [1 2 3]}}
- (dc/map->composition
-  {:a {:b {:c {}}}
-   :d {:e (dc/into [4 5 6])}}))
-;; =>
-{:a {:b {:c {}}}
- :d {:e [1 2 3 4 5 6]}}
-
-;; use >into, which swaps the first two args, to merge two values
-(dc/compose
- {:a {:b {:c :going-awway}}
-  :d {:e [1 2 3]}}
- (dc/map->composition
-  {:a {:b {:c {}}}
-   :d {:e (dc/>into [4 5 6])}}))
-;; =>
-{:a {:b {:c {}}}
- :d {:e [4 5 6 1 2 3]}}
-(into [4 5 6] [1 2 3])
+  (is (= {:a {:b {:c {}}}
+          :d {:e [4 5 6 1 2 3]}}
+         (dc/compose {:a {:b {:c :going-awway}}
+                      :d {:e [1 2 3]}}
+                     ^::dc/map-updates
+                     {:a {:b {:c {}}}
+                      :d {:e (dc/>into [4 5 6])}}))))

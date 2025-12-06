@@ -4,13 +4,7 @@
 #?(:clj
    (defmacro defupdater
      "creates a composing function over "
-     [fname]
+     [defname f]
      `(do
-        (defn ~fname
-          [& args#]
-          {:donut.compose/composing-function ~(symbol "clojure.core" (name fname))
-           :donut.compose/args               args#})
-        (defn ~(symbol (str ">" fname))
-          [& args#]
-          {:donut.compose/composing-function (donut.compose/>f ~(symbol "clojure.core" (name fname)))
-           :donut.compose/args               args#}))))
+        (def ~defname (donut.compose/updater ~f))
+        (def ~(symbol (str ">" defname)) (donut.compose/>updater ~f)))))

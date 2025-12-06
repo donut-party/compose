@@ -8,7 +8,7 @@
 
 (declare
  update  merge  into  conj  assoc  map  mapv
- >update >merge >into >conj >assoc >map >mapv >f)
+ >update >merge >into >conj >assoc >map >mapv)
 
 (defn >f
   [f]
@@ -19,63 +19,63 @@
 (defn updater
   [f]
   (fn [& args]
-    {:donut.compose/composing-function f
-     :donut.compose/args               args}))
+    {::update-f f
+     ::args     args}))
 
 (defn >updater
   [f]
   (fn [& args]
-    {:donut.compose/composing-function (>f f)
-     :donut.compose/args               args}))
+    {::update-f (>f f)
+     ::args     args}))
 
-(defupdater update)
-(defupdater merge)
-(defupdater into)
-(defupdater conj)
-(defupdater assoc)
-(defupdater map)
-(defupdater mapv)
+(defupdater update clj/update)
+(defupdater merge clj/merge)
+(defupdater into clj/into)
+(defupdater conj clj/conj)
+(defupdater assoc clj/assoc)
+(defupdater map clj/map)
+(defupdater mapv clj/mapv)
 
 (defn orf
+  "or as a function so that it can be treated as a value"
   [& args]
   (some identity args))
 
 (def or (updater orf))
 
-(defn compose-update
-  [base path update-val]
-  (if-let [composing-function (::composing-function update-val)]
-    (update-in base path (fn [x] (apply composing-function x (::args update-val))))
-    (assoc-in base path update-val)))
-
-(defn compose
-  [base composition]
-  (reduce-kv compose-update base composition))
-
-(defn map->composition
+(defn map->updates
   [m]
-  (loop [composable      {}
+  (loop [updates         {}
          remaining-paths (clj/mapv vector (keys m))]
     (let [[current-path & new-remaining-paths] remaining-paths
           current-value                        (get-in m current-path)
           current-map?                         (map? current-value)]
       (cond
         (empty? remaining-paths)
-        composable
+        updates
 
         (clj/or (not current-map?)
                 (and current-map?
                      (clj/or (empty? current-value)
-                             (::composing-function current-value))))
-        (recur (clj/assoc composable current-path current-value)
+                             (::update-f current-value))))
+        (recur (clj/assoc updates current-path current-value)
                new-remaining-paths)
 
         :else
-        (recur composable
-               (clj/into
-                (clj/mapv (fn [k] (clj/conj current-path k))
-                          (keys current-value))
-                new-remaining-paths))))))
+        (recur updates
+               (clj/into (clj/mapv (fn [k] (clj/conj current-path k))
+                                   (keys current-value))
+                         new-remaining-paths))))))
 
-;; TODO composer for or
-;; TODO rename composer to updater?
+(defn compose-update
+  [base path update-val]
+  (if-let [composing-function (::update-f update-val)]
+    (update-in base path (fn [x] (apply composing-function x (::args update-val))))
+    (assoc-in base path update-val)))
+
+(defn compose
+  [base updates]
+  (reduce-kv compose-update
+             base
+             (cond-> updates
+               (-> updates meta ::map-updates) map->updates)))
