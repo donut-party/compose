@@ -18,7 +18,7 @@
 (def basis (b/create-basis {:project "deps.edn"}))
 
 (defn- pom-template [version]
-  [[:description "lil helpers for the cute lil framework"]
+  [[:description "compose data"]
    [:url "https://github.com/donut-power/compose"]
    [:licenses
     [:license
