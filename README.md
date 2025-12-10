@@ -125,3 +125,34 @@ You can also use a path syntax:
 ;; =>
 {:http {:port 7000, :join? false}}
 ```
+
+# why
+
+The donut project as a whole aspires to provide a framework for Clojure web
+development. It takes a data-driven approach, where the behavior of donut
+libraries is described with data as much as possible. This is the best possible
+way to provide default behavior which can be extended, overridden, or configured
+by library consumers.
+
+There are many areas where donut provides default configuration, and I want to
+have a clear and consistent way for working with that. For example, UI
+components might have default configuration that looks like this:
+
+``` clojure
+{:class ["donut-input donut-active"]
+ :on    {:success [default-success-handler]
+         :fail    [default-fail-handler]}}
+```
+
+Developers need to be able to clearly and concisely either override or build up
+these default values. For example, a dev might want to preserve the default
+classes while adding additional classes, and also change the `:success` handler
+while adding an additional `:fail` handler. They could do that by passing in a map to the
+component funtion like this:
+
+``` clojure
+{:class (dc/into ["px-1"])
+ :on {:success [success-handler]
+      :fail (dc/into [additional-fail-handler])}}
+```
+
