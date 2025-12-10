@@ -139,7 +139,7 @@ have a clear and consistent way for working with that. For example, UI
 components might have default configuration that looks like this:
 
 ``` clojure
-{:class ["donut-input donut-active"]
+{:class ["donut-input" "donut-active"]
  :on    {:success [default-success-handler]
          :fail    [default-fail-handler]}}
 ```
