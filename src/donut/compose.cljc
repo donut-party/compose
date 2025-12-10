@@ -60,7 +60,7 @@
           current-map?                         (map? current-value)]
       (cond
         (empty? remaining-paths)
-        updates
+        (with-meta updates {::path-updates true})
 
         (clj/or (not current-map?)
                 (and current-map?
@@ -86,4 +86,4 @@
   (reduce-kv apply-update
              base
              (cond-> updates
-               (-> updates meta ::map-updates) map->updates)))
+               (not (-> updates meta ::path-updates)) map->updates)))

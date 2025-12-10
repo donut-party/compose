@@ -3,40 +3,49 @@
             #?(:clj [clojure.test :refer [deftest is]]
                :cljs [cljs.test :refer [deftest is] :include-macros true])))
 
+;; use ^::dc/path-updates if you prefer that form
 (deftest compose-test
   (is (= {} (dc/compose {} {})))
 
   (is (= {:foo :bar}
-         (dc/compose {} {[:foo] :bar})))
+         (dc/compose {}
+                     ^::dc/path-updates
+                     {[:foo] :bar})))
 
   (is (= {:foo [:bar :baz]}
          (dc/compose {:foo [:bar]}
+                     ^::dc/path-updates
                      {[:foo] (dc/conj :baz)})))
 
   ;; calls (into nil [1 2 3])
   (is (= {:a {:b {:c '(3 2 1)}}}
          (dc/compose {:a nil}
+                     ^::dc/path-updates
                      {[:a :b :c] (dc/into [1 2 3])})))
 
   (is (= {:a {:b {:c [1 2 3]}}}
          (dc/compose {:a {:b {:c []}}}
+                     ^::dc/path-updates
                      {[:a :b :c] (dc/into [1 2 3])})))
 
   ;; default behavior is to replace value at path:
   ;; the map {:c 2 :d 3} replaces the map {:b 1}
   (is (= {:a {:c 2, :d 3}}
          (dc/compose {:a {:b 1}}
+                     ^::dc/path-updates
                      {[:a] {:c 2, :d 3}})))
 
   ;; use the merge updater for merging
   (is (= {:a {:b 1, :c 2, :d 3}}
          (dc/compose {:a {:b 1}}
+                     ^::dc/path-updates
                      {[:a] (dc/merge {:c 2, :d 3})}))))
 
 ;; use the or updater to only "set" a value if it's not already present
 (deftest or-test
   (is (= {:a :original}
          (dc/compose {:a :original}
+                     ^::dc/path-updates
                      {[:a] (dc/or :replacement)}))))
 
 ;; >f versions of functions reverse the first two arguments
@@ -45,11 +54,13 @@
   ;; {:b 1} gets merged into {:b 4, :c 2}
   (is (= {:a {:b 1, :c 2}}
          (dc/compose {:a {:b 1}}
+                     ^::dc/path-updates
                      {[:a] (dc/>merge {:b 4, :c 2})})))
 
   ;; calls (into [4 5 6] [1 2 3])
   (is (= {:foo [4 5 6 1 2 3]}
          (dc/compose {:foo [1 2 3]}
+                     ^::dc/path-updates
                      {[:foo] (dc/>into [4 5 6])}))))
 
 (deftest map->updates-test
@@ -92,25 +103,21 @@
                       {:a {:b {:c {}}}
                        :d {:e (dc/>into [4 5 6])}})))))
 
-;; you can add ^::dc/map-updates to a map and it'll be passed through
-;; dc/map->updates first
-(deftest compose-with-map-updates-metadata-test
+;; works with maps
+(deftest compose-with-maps-test
   (is (= {:a {:b 1
               :c 2}}
          (dc/compose {:a {:b 1}}
-                     ^::dc/map-updates
                      {:a (dc/>merge {:b 4 :c 2})})))
 
   (is (= {:foo [4 5 6 1 2 3]}
          (dc/compose {:foo [1 2 3]}
-                     ^::dc/map-updates
                      {:foo (dc/>into [4 5 6])})))
 
   (is (= {:a {:b {:c {}}}
           :d {:e [4 5 6 1 2 3]}}
          (dc/compose {:a {:b {:c :going-awway}}
                       :d {:e [1 2 3]}}
-                     ^::dc/map-updates
                      {:a {:b {:c {}}}
                       :d {:e (dc/>into [4 5 6])}}))))
 
@@ -135,7 +142,6 @@
                       :or       :a
                       :map      [1 2 3]
                       :mapv     [1 2 3]}
-                     ^::dc/map-updates
                      {:into     (dc/into [4 5 6])
                       :>into    (dc/>into [4 5 6])
                       :merge    (dc/merge {:b 2})
