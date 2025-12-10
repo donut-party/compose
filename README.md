@@ -129,7 +129,7 @@ You can also use a path syntax:
 # why
 
 The donut project as a whole aspires to provide a framework for Clojure web
-development. It takes a data-driven approach, where the behavior of donut
+development. It takes a data-oriented approach, where the behavior of donut
 libraries is described with data as much as possible. This is the best possible
 way to provide default behavior which can be extended, overridden, or configured
 by library consumers.
