@@ -144,7 +144,7 @@ components might have default configuration that looks like this:
          :fail    [default-fail-handler]}}
 ```
 
-Developers need to be able to clearly and concisely either override or build up
+Developers need to be able to clearly and concisely either override or build on
 these default values. For example, a dev might want to preserve the default
 classes while adding additional classes, and also change the `:success` handler
 while adding an additional `:fail` handler. They could do that by passing in a map to the
