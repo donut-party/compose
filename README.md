@@ -3,6 +3,8 @@
 # Clear and flexible data composition
 
 ``` clojure
+(require '[donut.compose :as dc])
+
 ;; acts like a deep merge
 (dc/compose
  {:http {:port  7000
