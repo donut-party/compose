@@ -1,0 +1,4 @@
+{:linters
+ {:unresolved-symbol
+  ;; this macro binds these symbols as a convenience
+  {:exclude [(donut.compose/with-compose-updates [compose-with])]}}}

@@ -1,6 +1,7 @@
 (ns donut.compose
   (:require
-   [clojure.core :as clj])
+   [clojure.core :as clj]
+   [clojure.walk :as walk])
   (:refer-clojure :exclude [update merge into conj map mapv or]))
 
 (defn >f
@@ -87,3 +88,27 @@
              base
              (cond-> updates
                (not (-> updates meta ::path-updates)) map->updates)))
+
+;;---
+;;
+;;---
+
+(defn composable
+  [updates k v]
+  (compose v (get updates k)))
+
+(defn rewrite-body
+  [updates-name body]
+  (walk/prewalk (fn [x]
+                  (if (and (seq? x) (= (first x) 'compose-with))
+                    (let [[_ k v] x]
+                      `(composable ~updates-name ~k ~v))
+                    x))
+                body))
+
+#?(:clj
+   (defmacro with-compose-updates
+     [uname & body]
+     (let [updates-name (gensym 'updates-)]
+       `(let [~updates-name ~uname]
+          ~@(rewrite-body updates-name body)))))

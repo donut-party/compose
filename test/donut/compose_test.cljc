@@ -152,3 +152,39 @@
                       :or       (dc/or :b)
                       :map      (dc/map inc)
                       :mapv     (dc/mapv inc)}))))
+
+(defn my-form
+  [opts]
+  [:form
+   [:div (dc/compose {:class ["bg-white" "mb-1"]} (:wrapper-opts opts))
+    [:label (dc/compose {} (:label-opts opts))
+     (or (:label-text opts) "location:")
+     [:input (dc/compose {:type "text" :name "location" :class ["px-1"]} (:input-opts opts))]]
+    [:div (dc/compose {} (:input-wrapper-opts opts))
+     [:input (dc/compose {:type "submit" :value ""} (:submit-opts opts))]]]])
+
+(defn my-form
+  [opts]
+  (dc/with-composable opts
+    [:form
+     [:div (composable :wrapper-opts {:class ["bg-white" "mb-1"]})
+      [:label (composable :label-opts {})
+       (composable :label-text "location:")
+       [:input (composable :input-opts {:type "text" :name "location" :class ["px-1"]})]]
+      [:div (composable :input-wrapper-opts {})
+       [:input (composable :submit-opts {:type "submit" :value ""})]]]]))
+
+(defn my-form
+  [opts]
+  (binding [dc/*compose-updates* opts]
+    [:form
+     [:div (dc/composable :wrapper-opts {:class ["bg-white" "mb-1"]})
+      [:label (dc/composable :label-opts {})
+       (dc/composable :label-text "location:")
+       [:input (dc/composable :input-opts {:type "text" :name "location" :class ["px-1"]})]]
+      [:div (dc/composable :input-wrapper-opts {})
+       [:input (dc/composable :submit-opts {:type "submit" :value ""})]]]]))
+
+(my-form
+ {:wrapper-opts (dc/into ["rounded-md"])
+  :label-text   "your location:"})
