@@ -91,10 +91,11 @@
                (not (-> updates meta ::path-updates)) map->updates)))
 
 (defn composable
-  "returns a function that providers a nice interface for point composing"
+  "returns a function that provides a nice interface for point composing"
   [updates]
-  (fn
-    ([k]
-     (get (compose {k nil} updates) k))
+  (fn composable-fn
+    ([k] (composable-fn k nil))
     ([k base]
-     (get (compose {k base} updates) k))))
+     (-> {k base}
+         (compose updates)
+         (get k)))))
