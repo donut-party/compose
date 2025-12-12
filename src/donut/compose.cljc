@@ -83,8 +83,18 @@
     (assoc-in base path update-val)))
 
 (defn compose
+  "updatey-merge of two values"
   [base updates]
   (reduce-kv apply-update
              base
              (cond-> updates
                (not (-> updates meta ::path-updates)) map->updates)))
+
+(defn composable
+  "returns a function that providers a nice interface for point composing"
+  [updates]
+  (fn
+    ([k]
+     (compose nil (get updates k)))
+    ([k base]
+     (compose base (get updates k)))))

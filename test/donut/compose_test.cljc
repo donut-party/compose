@@ -155,3 +155,25 @@
                       :or       (dc/or :b)
                       :map      (dc/map inc)
                       :mapv     (dc/mapv inc)}))))
+
+;; composing for hiccupy-type functions
+
+(defn form
+  [opts]
+  (let [composable (dc/composable opts)]
+    [:form
+     [:div (composable :wrapper-opts {:class ["mx-1"]})
+      [:label (composable :label-opts)
+       ;; TODO this makes sense but i don't like it
+       (:label-text opts "default label")]]]))
+
+(deftest composable-test
+  (is (= [:form
+          [:div {:class ["mx-1"]}
+           [:label nil "default label"]]]
+         (form {})))
+  (is (= [:form
+          [:div {:class ["mx-1" "pb-1"]}
+           [:label nil "my text"]]]
+         (form {:wrapper-opts {:class (dc/into ["pb-1"])}
+                :label-text "my text"}))))
