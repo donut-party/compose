@@ -165,7 +165,7 @@
      [:div (composable :wrapper-opts {:class ["mx-1"]})
       [:label (composable :label-opts)
        ;; TODO this makes sense but i don't like it
-       (:label-text opts "default label")]]]))
+       (composable :label-text "default label")]]]))
 
 (deftest composable-test
   (is (= [:form

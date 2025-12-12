@@ -95,6 +95,6 @@
   [updates]
   (fn
     ([k]
-     (compose nil (get updates k)))
+     (get (compose {k nil} updates) k))
     ([k base]
-     (compose base (get updates k)))))
+     (get (compose {k base} updates) k))))
