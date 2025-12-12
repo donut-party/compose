@@ -1,7 +1,7 @@
 (ns donut.compose
   (:require
    [clojure.core :as clj])
-  (:refer-clojure :exclude [update merge into conj map mapv or]))
+  (:refer-clojure :exclude [update merge into conj dissoc map mapv or]))
 
 (defn >f
   "combinator that swaps first two args to a function.
@@ -37,6 +37,7 @@
 (def into   (updater clj/into))
 (def >into  (updater (>f clj/into)))
 (def conj   (updater clj/conj))
+(def dissoc (updater clj/dissoc))
 (def map    (updater (>f clj/map)))
 (def mapv   (updater (>f clj/mapv)))
 
