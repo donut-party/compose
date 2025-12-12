@@ -162,18 +162,27 @@
   [opts]
   (let [composable (dc/composable opts)]
     [:form
-     [:div (composable :wrapper-opts {:class ["mx-1"]})
-      [:label (composable :label-opts)
-       ;; TODO this makes sense but i don't like it
-       (composable :label-text "default label")]]]))
+     [:div (composable :wrapper-opts {:class ["mx-1"]}) ;; works with a map
+      [:label (composable :label-opts) ;; works with nil
+       (composable :label-text "default label")] ;; works with scalar
+      [:input {:type :submit
+               :class (composable :input-class ["p-1"])}]]])) ;; works with vector
 
 (deftest composable-test
+  ;; no customization
   (is (= [:form
-          [:div {:class ["mx-1"]}
-           [:label nil "default label"]]]
-         (form {})))
+          [:div
+           {:class ["mx-1"]}
+           [:label nil "default label"]
+           [:input {:class ["p-1"], :type :submit}]]]
+         (form nil)))
+  ;; composing
   (is (= [:form
-          [:div {:class ["mx-1" "pb-1"]}
-           [:label nil "my text"]]]
+          [:div
+           {:class ["mx-1" "pb-1"]}
+           [:label {:class ["label opts"]} "my text"]
+           [:input {:type :submit, :class ["mb-1" "p-1"]}]]]
          (form {:wrapper-opts {:class (dc/into ["pb-1"])}
-                :label-text "my text"}))))
+                :label-text "my text"
+                :label-opts {:class ["label opts"]}
+                :input-class (dc/>into ["mb-1"])}))))
