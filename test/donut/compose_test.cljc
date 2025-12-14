@@ -156,6 +156,79 @@
                       :map      (dc/map inc)
                       :mapv     (dc/mapv inc)}))))
 
+(deftest function-updaters-test
+  (let [behavior   (atom [])
+        base-fn    (fn [x] (swap! behavior conj [:from-base x]) x)
+        updates-fn (fn [x] (swap! behavior conj [:from-updates x]) x)]
+
+    (let [base     {:|| base-fn}
+          updates  {:|| (dc/|| updates-fn)}
+          composed (dc/compose base updates)]
+      ;; || true
+      ((:|| composed) true)
+      (is (= [[:from-base true]
+              [:from-updates true]]
+             @behavior))
+
+      ;; || false
+      (reset! behavior [])
+      ((:|| composed) false)
+      (is (= [[:from-base false]
+              [:from-updates false]]
+             @behavior)))
+
+    (reset! behavior [])
+
+    (let [base     {:>|| base-fn}
+          updates  {:>|| (dc/>|| updates-fn)}
+          composed (dc/compose base updates)]
+      ;; >|| true
+      ((:>|| composed) true)
+      (is (= [[:from-updates true]
+              [:from-base true]]
+             @behavior))
+
+      ;; >|| false
+      (reset! behavior [])
+      ((:>|| composed) false)
+      (is (= [[:from-updates false]
+              [:from-base false]]
+             @behavior)))
+
+    (reset! behavior [])
+
+    (let [base     {:&& base-fn}
+          updates  {:&& (dc/&& updates-fn)}
+          composed (dc/compose base updates)]
+      ;; && true
+      ((:&& composed) true)
+      (is (= [[:from-base true]
+              [:from-updates true]]
+             @behavior))
+
+      ;; && false
+      (reset! behavior [])
+      ((:&& composed) false)
+      (is (= [[:from-base false]]
+             @behavior)))
+
+    (reset! behavior [])
+
+    (let [base     {:>&& base-fn}
+          updates  {:>&& (dc/>&& updates-fn)}
+          composed (dc/compose base updates)]
+      ;; >&& true
+      ((:>&& composed) true)
+      (is (= [[:from-updates true]
+              [:from-base true]]
+             @behavior))
+
+      ;; >&& false
+      (reset! behavior [])
+      ((:>&& composed) false)
+      (is (= [[:from-updates false]]
+             @behavior)))))
+
 ;; composing for hiccupy-type functions
 
 (defn form
@@ -163,8 +236,8 @@
   (let [composable (dc/composable opts)]
     [:form
      [:div (composable :wrapper-opts {:class ["mx-1"]}) ;; works with a map
-      [:label (composable :label-opts) ;; works with nil
-       (composable :label-text "default label")] ;; works with scalar
+      [:label (composable :label-opts)                  ;; works with nil
+       (composable :label-text "default label")]        ;; works with scalar
       [:input {:type :submit
                :class (composable :input-class ["p-1"])}]]])) ;; works with vector
 

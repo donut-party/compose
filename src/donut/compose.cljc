@@ -1,17 +1,8 @@
 (ns donut.compose
   (:require
-   [clojure.core :as clj])
+   [clojure.core :as clj]
+   [donut.compose.combine :as dcc])
   (:refer-clojure :exclude [update merge into conj dissoc map mapv or]))
-
-(defn >f
-  "combinator that swaps first two args to a function.
-
-  the `>` is meant as a mnemonic for this arg swapping: `sort` sorts ascending
-  by default but you can reverse the order with `>`"
-  [f]
-  (fn arg-swapped
-    ([a b] (f b a))
-    ([a b & rest] (apply f b a rest))))
 
 (defn updater
   [f]
@@ -33,13 +24,17 @@
   (updater orf))
 
 (def merge  (updater clj/merge))
-(def >merge (updater (>f clj/merge)))
+(def >merge (updater dcc/>merge))
 (def into   (updater clj/into))
-(def >into  (updater (>f clj/into)))
+(def >into  (updater dcc/>into))
 (def conj   (updater clj/conj))
 (def dissoc (updater clj/dissoc))
-(def map    (updater (>f clj/map)))
-(def mapv   (updater (>f clj/mapv)))
+(def map    (updater (dcc/>f clj/map)))
+(def mapv   (updater (dcc/>f clj/mapv)))
+(def ||     (updater dcc/||))
+(def >||    (updater dcc/>||))
+(def &&     (updater dcc/&&))
+(def >&&    (updater dcc/>&&))
 
 (defn update
   "update updater"
@@ -91,7 +86,9 @@
              (cond-> updates
                (not (-> updates meta ::path-updates)) map->updates)))
 
-(def >compose (>f compose))
+(def >compose
+  "flipped compose"
+  (dcc/>f compose))
 
 (defn composable
   "returns a function that provides a nice interface for point composing. useful for hiccup"
