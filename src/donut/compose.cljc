@@ -29,7 +29,7 @@
   (some identity args))
 
 (def or
-  "use this when you want to prefer the left side of a compose"
+  "or updater. use this when you want to prefer the left side of a compose"
   (updater orf))
 
 (def merge  (updater clj/merge))
@@ -42,6 +42,7 @@
 (def mapv   (updater (>f clj/mapv)))
 
 (defn update
+  "update updater"
   [f & args]
   (apply (updater f) args))
 
@@ -90,8 +91,10 @@
              (cond-> updates
                (not (-> updates meta ::path-updates)) map->updates)))
 
+(def >compose (>f compose))
+
 (defn composable
-  "returns a function that provides a nice interface for point composing"
+  "returns a function that provides a nice interface for point composing. useful for hiccup"
   [updates]
   (fn composable-fn
     ([k] (composable-fn k nil))
