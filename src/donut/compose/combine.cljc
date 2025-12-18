@@ -29,5 +29,10 @@
 
 (def >&& (>f &&))
 
+(defn wrap-f
+  "expects a middleware-style wrapping function"
+  [f1 f2]
+  (f2 f1))
+
 (def >merge (>f merge))
 (def >into (>f into))
