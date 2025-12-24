@@ -75,7 +75,12 @@
 (defn apply-update
   [base path update-val]
   (if-let [update-function (::update-f update-val)]
-    (update-in base path (fn [x] (apply update-function x (::args update-val))))
+    (update-in base path (fn [x]
+                           (try (apply update-function x (::args update-val))
+                                (catch #?(:clj Exception :cljs js/Object) e
+                                  (throw (ex-info "Exception composing values"
+                                                  (assoc update-val :base-val x :path path)
+                                                  e))))))
     (assoc-in base path update-val)))
 
 (defn compose
@@ -96,6 +101,11 @@
   (fn composable-fn
     ([k] (composable-fn k nil))
     ([k base]
-     (-> {k base}
-         (compose updates)
-         (get k)))))
+     (try
+       (-> {k base}
+           (compose updates)
+           (get k))
+       (catch #?(:clj Exception :cljs js/Object) e
+         (throw (ex-info "Exception composing composable"
+                         (assoc (ex-data e) :composition-key k)
+                         e)))))))
