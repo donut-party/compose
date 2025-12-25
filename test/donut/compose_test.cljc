@@ -259,3 +259,11 @@
                 :label-text "my text"
                 :label-opts {:class ["label opts"]}
                 :input-class (dc/>into ["mb-1"])}))))
+
+(deftest wrap-test
+  (is (= [:a :b]
+         (-> (dc/compose {:a (fn [] :a)}
+                         {:a (dc/wrap (fn [f]
+                                        (fn [] [(f) :b])))})
+             :a
+             ((fn [f] (f)))))))

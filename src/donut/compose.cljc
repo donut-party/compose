@@ -35,6 +35,7 @@
 (def >||    (updater dcc/>||))
 (def &&     (updater dcc/&&))
 (def >&&    (updater dcc/>&&))
+(def wrap   (updater dcc/wrap))
 
 (defn update
   "update updater"
