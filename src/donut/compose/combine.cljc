@@ -13,6 +13,9 @@
 (defn ||
   "combinator that calls f1 then f2. mnemonic from shell ||"
   [f1 f2]
+  (when (not (and (ifn? f1) (ifn? f2)))
+    (throw (ex-info "both arguments to || should implement IFn"
+                    {:f1 f1 :f2 f2})))
   (fn [& args]
     (apply f1 args)
     (apply f2 args)))
@@ -22,6 +25,9 @@
 (defn &&
   "combinator that calls f1, then f2 if f1 is truthy. mnemonic from shell &&"
   [f1 f2]
+  (when (not (and (ifn? f1) (ifn? f2)))
+    (throw (ex-info "both arguments to && should implement IFn"
+                    {:f1 f1 :f2 f2})))
   (fn [& args]
     (and
      (apply f1 args)
