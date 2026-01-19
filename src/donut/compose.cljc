@@ -92,6 +92,11 @@
              (cond-> updates
                (not (-> updates meta ::path-updates)) map->updates)))
 
+(defn compose-contained
+  "limits composing just to keys contained in base"
+  [base updates]
+  (compose base (select-keys updates (keys base))))
+
 (def >compose
   "flipped compose"
   (dcc/>f compose))

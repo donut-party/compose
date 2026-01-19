@@ -1,7 +1,7 @@
 (ns donut.compose-test
   (:require [donut.compose :as dc]
-            #?(:clj [clojure.test :refer [deftest is]]
-               :cljs [cljs.test :refer [deftest is] :include-macros true])))
+            #?(:clj [clojure.test :refer [deftest is testing]]
+               :cljs [cljs.test :refer [deftest is testing] :include-macros true])))
 
 ;; use ^::dc/path-updates if you prefer that form
 (deftest compose-test
@@ -267,3 +267,11 @@
                                         (fn [] [(f) :b])))})
              :a
              ((fn [f] (f)))))))
+
+(deftest compose-contained-test
+  (testing "only composes keys contained in base"
+    (is (= {:a 1}
+           (dc/compose-contained {:a 1} {:b 2})))
+
+    (is (= {:a 2}
+           (dc/compose-contained {:a 1} {:a (dc/update inc)})))))
