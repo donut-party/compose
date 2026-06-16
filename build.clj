@@ -19,7 +19,7 @@
 
 (defn- pom-template [version]
   [[:description "compose data"]
-   [:url "https://github.com/donut-power/compose"]
+   [:url "https://github.com/donut-party/compose"]
    [:licenses
     [:license
      [:name "MIT"]
@@ -28,9 +28,9 @@
     [:developer
      [:name "Daniel Higginbotham"]]]
    [:scm
-    [:url "https://github.com/donut-power/compose"]
-    [:connection "scm:git:https://github.com/donut-power/compose.git"]
-    [:developerConnection "scm:git:ssh:git@github.com:donut-power/compose.git"]
+    [:url "https://github.com/donut-party/compose"]
+    [:connection "scm:git:https://github.com/donut-party/compose.git"]
+    [:developerConnection "scm:git:ssh:git@github.com:donut-party/compose.git"]
     [:tag (str "v" version)]]])
 
 (defn- jar-opts [opts]
