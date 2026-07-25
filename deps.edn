@@ -1,6 +1,11 @@
 {:paths ["src"]
  :deps  {org.clojure/clojure {:mvn/version "1.10.3"}}
 
+ :donut/lib {:name           party.donut/compose
+             :description    "compose data"
+             :github         "donut-party/compose"
+             :version-prefix "0.0"}
+
  :aliases
  {:dev
   {:extra-deps  {org.clojure/clojure {:mvn/version "1.10.3"}}
@@ -21,6 +26,6 @@
 
 
   :build
-  {:deps       {io.github.clojure/tools.build {:mvn/version "0.9.6"}
-                slipset/deps-deploy           {:mvn/version "0.2.1"}}
-   :ns-default build}}}
+  {:deps       {io.github.donut-party/framework-build
+                {:git/sha "912e0b0ffc914cf1b5824650268307062d92e40c"}}
+   :ns-default donut.build}}}
